@@ -132,9 +132,3 @@ project_name: cartographer3d-plugin
 is_system_service: False
 managed_services: klipper
 info_tags: desc=Cartographer Plugin
-[update_manager goose_purge]
-type: git_repo
-primary_branch: main
-path: ~/goose_purge_macro
-origin: https://github.com/Graylag-PD/Goose-Purge-Macro.git
-managed_services: klipper
