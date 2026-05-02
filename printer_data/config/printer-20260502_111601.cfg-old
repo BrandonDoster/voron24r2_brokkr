@@ -1,5 +1,3 @@
-[include mmu/base/*.cfg]
-[include mmu/optional/client_macros.cfg]
 # [force_move] 
 # enable_force_move: true 
 # [include mmb_can_v2.cfg]
