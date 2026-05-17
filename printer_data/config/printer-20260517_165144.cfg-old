@@ -1,0 +1,518 @@
+# [force_move] 
+# enable_force_move: true 
+# [include mmb_can_v2.cfg]
+[include macros/*.cfg]
+[include mainsail.cfg]
+[include cartographer.cfg]
+[include goose_purge.cfg]
+[exclude_object]
+[gcode_arcs]
+[axis_twist_compensation]
+[skew_correction]
+# Happy-Hare
+# [include mmu/base/*.cfg]
+# [include mmu/optional/client_macros.cfg]
+
+[mcu CB1]
+serial: /tmp/klipper_host_mcu
+
+# Core
+[mcu]
+canbus_uuid: e1f2017faf04
+
+[mcu EBBCan]
+# canbus_uuid: e07809430fa5 #SB2209
+# canbus_uuid: b22b8207693a #EBB36g2
+serial: /dev/serial/by-id/usb-Klipper_stm32g0b1xx_19000A000450315741363420-if00
+restart_method: command
+
+[mcu cartographer]
+# canbus_uuid: bb45ba88481b
+serial: /dev/serial/by-id/usb-Cartographer_stm32g431xx_480044000C50315447313620-if00
+restart_method: command
+
+[printer]
+kinematics: corexy
+max_velocity: 300  
+max_accel: 10000    			
+max_z_velocity: 30 			
+max_z_accel: 350
+square_corner_velocity: 5.0
+
+[temperature_sensor MCU]
+sensor_type: temperature_mcu
+
+[temperature_sensor SoC]
+sensor_type: temperature_host
+
+[temperature_sensor EBB]
+sensor_type: Generic 3950
+# sensor_pin: EBBCan:gpio28 #SB2209
+sensor_pin: EBBCan:PA0 #EBB36g2
+pullup_resistor: 2200 #EBB36g2
+
+# [temperature_sensor chamber]
+# sensor_type: Generic 3950
+# sensor_pin: PB0
+# min_temp: 0
+# max_temp: 100
+# gcode_id: C
+
+# Motors
+## X (B) Motor 6
+[stepper_x]
+step_pin: PG9
+dir_pin: PD7
+enable_pin: !PG11
+microsteps: 16
+rotation_distance: 40
+full_steps_per_rotation:200  #set to 400 for 0.9 degree stepper
+# endstop_pin: ^EBBCan:gpio24 #SB2209
+endstop_pin: ^EBBCan:PA15 #EBB36g2
+position_min: 0
+position_endstop: 300 # 250/300/350
+position_max: 300 # 250/300/350
+homing_speed: 75
+homing_retract_dist: 5
+homing_positive_dir: true
+
+## Y (A) Motor5
+[stepper_y]
+step_pin: PG13
+dir_pin: PG12
+enable_pin: !PG15
+microsteps: 16
+rotation_distance: 40
+endstop_pin: ^PF4
+full_steps_per_rotation:200  #set to 400 for 0.9 degree stepper
+position_min: 0
+position_endstop: 305 # 250/300/350
+position_max: 305 # 250/300/350
+homing_speed: 75
+homing_retract_dist: 5
+homing_positive_dir: true
+
+## Z0 (FL) Motor4
+[stepper_z]
+step_pin: PB4
+dir_pin: PB3
+enable_pin: !PB6
+rotation_distance: 40
+gear_ratio: 80:16
+microsteps: 16
+endstop_pin: probe:z_virtual_endstop
+position_max: 290 # 240/290/340
+position_min: -5
+homing_speed: 8
+second_homing_speed: 3
+homing_retract_dist: 0
+
+##	Z1 (RL) Motor3
+[stepper_z1]
+step_pin: PB8
+dir_pin: !PB7
+enable_pin: !PE0
+rotation_distance: 40
+gear_ratio: 80:16
+microsteps: 16
+
+##	Z2 (RR) Motor2
+[stepper_z2]
+step_pin: PE2
+dir_pin: PE1
+enable_pin: !PE4
+rotation_distance: 40
+gear_ratio: 80:16
+microsteps: 16
+
+##	Z3 (FR) Motor1
+[stepper_z3]
+step_pin: PE6
+dir_pin: !PE5
+enable_pin: !PC14
+rotation_distance: 40
+gear_ratio: 80:16
+microsteps: 16
+
+# Extruder
+## E0 on SB2209
+[extruder]
+# step_pin: EBBCan:gpio18 #SB2209
+# dir_pin: EBBCan:gpio19 #SB2209
+# enable_pin: !EBBCan:gpio17 #SB2209
+step_pin: EBBCan:PB14 #EBB36g2
+dir_pin: EBBCan:PA8 #EBB36g2
+enable_pin: !EBBCan:PB6 #EBB36g2
+microsteps: 16
+rotation_distance: 47.088
+gear_ratio: 9:1
+nozzle_diameter: 0.400
+filament_diameter: 1.750
+# heater_pin: EBBCan:gpio7 #SB2209
+heater_pin: EBBCan:PB4 #EBB36g2
+#control: pid
+min_extrude_temp: 0
+min_temp: 0
+max_temp: 315
+max_extrude_only_distance: 105
+max_extrude_only_velocity: 50
+max_extrude_cross_section: 5
+max_power: 1
+#pid_kp: 21.527
+#pid_ki: 1.063
+#pid_kd: 108.982
+# sensor_type: MAX31865 #SB2209
+sensor_type: PT1000 #EBB36g2
+sensor_pin: EBBCan:PA3 #EBB36g2
+pullup_resistor: 2200 #EBB36g2
+# sensor_pin: EBBCan:gpio9 #SB2209
+# spi_software_sclk_pin: EBBCan:gpio10 #SB2209
+# spi_software_mosi_pin: EBBCan:gpio8 #SB2209
+# spi_software_miso_pin: EBBCan:gpio11 #SB2209
+# rtd_nominal_r: 100 #SB2209
+# rtd_reference_r: 430 #SB2209
+# rtd_num_of_wires: 2 #SB2209
+
+# Stepper Drivers
+[tmc2209 stepper_x]
+uart_pin: PG10
+#diag_pin: PF4
+run_current: 0.9
+interpolate: True
+# sense_resistor: 0.110
+stealthchop_threshold: 1
+
+[tmc2209 stepper_y]
+uart_pin: PG14
+#diag_pin: 
+run_current: 0.9
+interpolate: True
+# sense_resistor: 0.110
+stealthchop_threshold: 1
+
+[tmc2209 stepper_z]
+uart_pin: PB5
+#diag_pin: PF1
+run_current: 1.0
+interpolate: true
+# sense_resistor: 0.110
+stealthchop_threshold: 1
+
+[tmc2209 stepper_z1]
+uart_pin: PB9
+#diag_pin: PF2
+run_current: 1.0
+interpolate: true
+# sense_resistor: 0.110
+stealthchop_threshold: 1
+
+[tmc2209 stepper_z2]
+uart_pin: PE3
+#diag_pin: PF3
+run_current: 1.0
+interpolate: true
+# sense_resistor: 0.110
+stealthchop_threshold: 1
+
+[tmc2209 stepper_z3]
+uart_pin: PC13
+#diag_pin: PF4
+run_current: 1.0
+interpolate: true
+# sense_resistor: 0.110
+stealthchop_threshold: 1
+
+
+[tmc2209 extruder]
+# uart_pin: EBBCan:gpio20 #SB2209
+uart_pin: EBBCan:PB3 #EBB36g2
+run_current: 0.6
+stealthchop_threshold: 1
+
+# # TMC Autotune https://github.com/andrewmcgr/klipper_tmc_autotune
+# [autotune_tmc stepper_x]
+# motor: moons-ms17hd6p420i
+# # tuning_goal: silent
+# [autotune_tmc stepper_y]
+# motor: moons-ms17hd6p420i
+# # tuning_goal: silent
+
+# [autotune_tmc stepper_z]
+# motor: moons-ms17hd6p420i
+# # tuning_goal: silent
+# [autotune_tmc stepper_z1]
+# motor: moons-ms17hd6p420i
+# # tuning_goal: silent
+# [autotune_tmc stepper_z2]
+# motor: moons-ms17hd6p420i
+# # tuning_goal: silent
+# [autotune_tmc stepper_z3]
+# motor: moons-ms17hd6p420i
+# # tuning_goal: silent
+
+# [autotune_tmc extruder]
+# motor: ldo-36sth20-1004ahg-9T
+# # tuning_goal: silent
+
+# Bed Heater
+[heater_bed]
+heater_pin: PA1
+sensor_type: Generic 3950
+sensor_pin: PB1
+max_power: 1.0
+min_temp: 0
+max_temp: 115
+#control: pid
+#pid_kp: 58.437
+#pid_ki: 2.347
+#pid_kd: 363.769
+
+[filament_switch_sensor pre-extruder]
+pause_on_runout: True
+#runout_gcode: #after pause_on_runout
+insert_gcode: _BD_FILAMENT_LOAD_PROMPT
+#event_delay: 3.0 #default 3.0
+#pause_delay: 0.5 #default 0.5
+debounce_delay: 1 #default 0.0
+# switch_pin: ^EBBCan:gpio22 #SB2209
+switch_pin: ^EBBCan:PB5 #EBB36g2
+
+# Fans
+[multi_pin part_cooling] #EBB36g2
+pins: EBBCan:PD3, EBBCan:PA5 #EBB36g2
+
+[fan]
+pin: multi_pin:part_cooling #EBB36g2
+# pin: EBBCan:gpio13 #SB2209
+
+[heater_fan heatbreak_fan]
+# pin: EBBCan:gpio14 #SB2209
+pin: EBBCan:PD2 #EBB36g2
+tachometer_pin: EBBCan:PA4 #EBB36g2
+heater: extruder
+heater_temp: 70.0
+
+# [fan_generic ebb] #SB2209
+# pin: EBBCan:gpio6 #SB2209
+# kick_start_time: 0.5 #SB2209
+# off_below: 0.10 #SB2209
+
+[fan_generic nevermore]
+pin: PF9
+kick_start_time: 0.5
+off_below: 0.10
+
+[fan_generic bed_fans]
+pin: PF6
+kick_start_time: 0.5
+off_below: 0.10
+
+[fan_generic stepper_fan]
+pin: PF7
+max_power: 1.0
+shutdown_speed: 0.0
+kick_start_time: 0.5
+
+#[fan_generic pi_fan]
+#pin: CB1:gpio26
+
+# [temperature_fan cb1_Fan]
+# pin: CB1:gpio79
+# sensor_type: temperature_host
+# control: watermark
+# min_temp: 0
+# max_temp: 85
+# target_temp: 55
+
+# LEDs
+# [neopixel toolhead_light]
+# # pin: EBBCan:gpio16 #SB2209
+# pin: EBBCan:PC7 #EBB36g2
+# chain_count: 3 #SB2209
+# color_order: GRBW #SB2209
+
+[output_pin caselight]
+#Chamber Lighting - HE3 Connector
+pin: PA5
+pwm:true
+shutdown_value: 0
+cycle_time: 0.01
+
+# Homing and Gantry Adjustment
+[idle_timeout]
+timeout: 3300
+
+[safe_z_home]
+home_xy_position: 150,150 # 125,125/150,150/175,175
+speed: 100
+z_hop: 10
+
+[quad_gantry_level]
+##	Use QUAD_GANTRY_LEVEL to level a gantry.
+##	Min & Max gantry corners - measure from nozzle at MIN (0,0) and 
+##	MAX (250, 250), (300,300), or (350,350) depending on your printer size
+##	to respective belt positions
+##	Gantry Corners
+gantry_corners:
+	-60,-10
+	360,370 # 310,320/360,370/410,420
+## Probe points
+points:
+	50,25
+	50,225 # 50,175/50,225/50,275
+	250,225 # 200,175/250,225/300,275
+	250,25 # 200,25/250,25/300,25
+speed: 100
+horizontal_move_z: 10
+retries: 10
+retry_tolerance: 0.0075
+max_adjust: 10
+
+[bed_mesh]
+speed: 300
+horizontal_move_z: 5
+# mesh_min: 10,10
+# mesh_max: 290,290 # 240,240/290,290/340,340
+mesh_min: 40, 40
+mesh_max: 260,260
+algorithm: bicubic
+# zero_reference_position: 150,150 #for use with stock z endstop
+
+# [adxl345] #SB2209
+# cs_pin: EBBCan:gpio1 #SB2209 
+# spi_software_sclk_pin: EBBCan:gpio2 #SB2209
+# spi_software_mosi_pin: EBBCan:gpio0 #SB2209
+# spi_software_miso_pin: EBBCan:gpio3 #SB2209
+# axes_map: z,-y,x #SB2209
+
+[lis2dw EBB36g2] #EBB36g2
+cs_pin: EBBCan:PB1 #EBB36g2
+spi_bus:spi2_PB2_PB11_PB10 #EBB36g2
+axes_map: x,y,z #EBB36g2`
+
+[resonance_tester]
+probe_points: 150, 150, 20 # 125, 125/150, 150/175, 175
+accel_chip: lis2dw EBB36g2
+
+[board_pins]
+aliases:
+    # EXP1 header
+    EXP1_1=PE7, EXP1_2=PG1,
+    EXP1_3=PG0, EXP1_4=PF15,
+    EXP1_5=PF14, EXP1_6=PF13,    # Slot in the socket on this side
+    EXP1_7=PF12, EXP1_8=PF11,
+    EXP1_9=<GND>, EXP1_10=<5V>,
+
+    # EXP2 header
+    EXP2_1=PE13, EXP2_2=PE12,
+    EXP2_3=PE15, EXP2_4=PE11,
+    EXP2_5=PE10, EXP2_6=PE14,      # Slot in the socket on this side
+    EXP2_7=PE8, EXP2_8=<RST>,
+    EXP2_9=<GND>, EXP2_10=<NC>
+
+# Core Macros
+[delayed_gcode _Printer_Bootup]
+initial_duration: 1
+gcode:
+  SET_FAN_SPEED FAN=stepper_fan SPEED=1
+  SET_PIN PIN=caselight VALUE=0.50
+
+[gcode_macro G32]
+gcode:
+    BED_MESH_CLEAR
+    G28
+    QUAD_GANTRY_LEVEL
+    G28
+    G0 X150 Y150 Z30 F3600 # X125 Y125/X150 Y150/X175 Y175
+
+#*# <---------------------- SAVE_CONFIG ---------------------->
+#*# DO NOT EDIT THIS BLOCK OR BELOW. The contents are auto-generated.
+#*#
+#*# [heater_bed]
+#*# control = pid
+#*# pid_kp = 61.676
+#*# pid_ki = 3.485
+#*# pid_kd = 272.916
+#*#
+#*# [extruder]
+#*# control = pid
+#*# pid_kp = 20.504
+#*# pid_ki = 1.381
+#*# pid_kd = 76.119
+#*#
+#*# [input_shaper]
+#*# shaper_type_x = mzv
+#*# shaper_freq_x = 61.4
+#*# shaper_type_y = mzv
+#*# shaper_freq_y = 41.4
+#*#
+#*# [bed_mesh 100c-2hrs]
+#*# version = 1
+#*# points =
+#*# 	-0.014159, 0.043341, 0.048341, 0.070841, 0.073341, 0.078341, 0.055841, 0.075841, 0.068341, 0.045841, 0.040841, 0.035841
+#*# 	0.005841, 0.013341, 0.060841, 0.070841, 0.073341, 0.078341, 0.060841, 0.068341, 0.068341, 0.053341, 0.055841, 0.040841
+#*# 	-0.006659, 0.003341, 0.040841, 0.055841, 0.048341, 0.063341, 0.053341, 0.048341, 0.060841, 0.045841, 0.020841, 0.030841
+#*# 	-0.031659, 0.005841, 0.043341, 0.035841, 0.070841, 0.078341, 0.068341, 0.060841, 0.055841, 0.043341, 0.058341, 0.045841
+#*# 	-0.019159, 0.010841, 0.035841, 0.048341, 0.045841, 0.050841, 0.060841, 0.055841, 0.058341, 0.035841, 0.053341, 0.038341
+#*# 	-0.016659, 0.013341, 0.050841, 0.058341, 0.055841, 0.060841, 0.053341, 0.050841, 0.060841, 0.058341, 0.038341, 0.033341
+#*# 	0.013341, 0.028341, 0.073341, 0.063341, 0.063341, 0.058341, 0.060841, 0.053341, 0.060841, 0.050841, 0.058341, 0.050841
+#*# 	0.000841, 0.028341, 0.068341, 0.085841, 0.060841, 0.055841, 0.058341, 0.053341, 0.055841, 0.068341, 0.053341, 0.048341
+#*# 	0.033341, 0.063341, 0.065841, 0.088341, 0.078341, 0.075841, 0.080841, 0.080841, 0.045841, 0.053341, 0.040841, 0.033341
+#*# 	0.028341, 0.050841, 0.073341, 0.078341, 0.100841, 0.110841, 0.063341, 0.070841, 0.053341, 0.055841, 0.030841, 0.035841
+#*# 	0.078341, 0.095841, 0.105841, 0.110841, 0.113341, 0.105841, 0.088341, 0.088341, 0.058341, 0.063341, 0.058341, 0.043341
+#*# 	0.083341, 0.108341, 0.113341, 0.138341, 0.110841, 0.125841, 0.098341, 0.073341, 0.075841, 0.065841, 0.045841, 0.033341
+#*# x_count = 12
+#*# y_count = 12
+#*# mesh_x_pps = 2
+#*# mesh_y_pps = 2
+#*# algo = bicubic
+#*# tension = 0.2
+#*# min_x = 40.0
+#*# max_x = 260.0
+#*# min_y = 40.0
+#*# max_y = 260.0
+#*#
+#*# [bed_mesh default]
+#*# version = 1
+#*# points =
+#*# 	-0.030000, -0.002500, -0.025000
+#*# 	-0.035000, -0.010000, -0.012500
+#*# 	-0.020000, -0.012500, -0.045000
+#*# x_count = 3
+#*# y_count = 3
+#*# mesh_x_pps = 2
+#*# mesh_y_pps = 2
+#*# algo = lagrange
+#*# tension = 0.2
+#*# min_x = 62.2
+#*# max_x = 238.04000000000002
+#*# min_y = 62.49
+#*# max_y = 238.31
+#*#
+#*# [cartographer]
+#*# z_backlash = 0.00544
+#*#
+#*# [axis_twist_compensation]
+#*# z_compensations = -0.017696, -0.006643, -0.002785, 0.011553, 0.015572
+#*# compensation_start_x = 40.0
+#*# compensation_end_x = 257.0
+#*#
+#*# [skew_correction Calilantern]
+#*# xy_skew = 0.005027577203053201
+#*# xz_skew = 0.0012084459835311448
+#*# yz_skew = 0.0030094701224197043
+#*#
+#*# [cartographer scan_model default]
+#*# coefficients = 1.4612757613292469,1.9548834657683816,0.8541558414267177,0.30600899756860217,0.4077340012638534,0.7628809495142209,-0.2112482617907868,-0.7742315570760153,0.28821625411146806,0.4513695678223309
+#*# domain = 3.26551371273095e-07,3.413057004794036e-07
+#*# z_offset = 0
+#*# reference_temperature = 26.7
+#*# software_version = 1.6.0
+#*# mcu_version = CARTOGRAPHER v4 6.2.0
+#*#
+#*# [cartographer touch_model default]
+#*# threshold = 1140
+#*# speed = 2
+#*# z_offset = -0.05
+#*# software_version = 1.6.0
+#*# mcu_version = CARTOGRAPHER v4 6.2.0
